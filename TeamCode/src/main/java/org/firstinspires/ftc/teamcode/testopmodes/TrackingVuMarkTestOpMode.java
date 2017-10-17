@@ -26,12 +26,14 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.firstinspires.ftc.robotcontroller.external.samples;
+package org.firstinspires.ftc.teamcode.testopmodes;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
 
+import org.firstinspires.ftc.robotcontroller.external.samples.ConceptVuforiaNavigation;
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
 import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
@@ -45,6 +47,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
+
+import eaglerobotics.library.drivetrain.Holonomic;
 
 /**
  * This OpMode illustrates the basics of using the Vuforia engine to determine
@@ -65,13 +69,20 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
  * is explained in {@link ConceptVuforiaNavigation}.
  */
 
-@Autonomous(name="Concept: VuMark Id", group ="Concept")
+@Autonomous(name="Concept: Track The Mark", group ="Concept")
 @Disabled
-public class ConceptVuMarkIdentification extends LinearOpMode {
+public class TrackingVuMarkTestOpMode extends LinearOpMode {
 
     public static final String TAG = "Vuforia VuMark Sample";
 
     OpenGLMatrix lastLocation = null;
+
+    DcMotor leftFrontMotor;
+    DcMotor leftRearMotor;
+    DcMotor rightFrontMotor;
+    DcMotor rightRearMotor;
+
+    Holonomic holonomic;
 
     /**
      * {@link #vuforia} is the variable we will use to store our instance of the Vuforia
@@ -123,6 +134,14 @@ public class ConceptVuMarkIdentification extends LinearOpMode {
         VuforiaTrackable relicTemplate = relicTrackables.get(0);
         relicTemplate.setName("relicVuMarkTemplate"); // can help in debugging; otherwise not necessary
 
+        // Get motors from map
+        leftFrontMotor = hardwareMap.dcMotor.get("leftFrontMotor");
+        leftRearMotor = hardwareMap.dcMotor.get("leftRearMotor");
+        rightFrontMotor = hardwareMap.dcMotor.get("rightFrontMotor");
+        rightRearMotor = hardwareMap.dcMotor.get("rightRearMotor");
+
+        holonomic = new Holonomic(leftFrontMotor, leftRearMotor, rightFrontMotor, rightRearMotor);
+
         telemetry.addData(">", "Press Play to start");
         telemetry.update();
         waitForStart();
@@ -166,6 +185,27 @@ public class ConceptVuMarkIdentification extends LinearOpMode {
                     double rX = rot.firstAngle;
                     double rY = rot.secondAngle;
                     double rZ = rot.thirdAngle;
+
+
+
+                    double tempX = 0;
+                    double tempY = 0;
+                    double tempZ = 0;
+                    if(tX >= 10){
+                        tempX = .25;
+                    } else {
+                        tempX = 0;
+                    }
+
+                    if(rX > 5){
+                        tempZ = .25;
+                    } else if(rX < 5){
+                        tempZ = -.25;
+                    } else {
+                        tempZ = 0;
+                    }
+
+                    holonomic.run(tempX, tempY, tempZ);
                 }
             }
             else {
