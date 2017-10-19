@@ -114,6 +114,7 @@ public class Meet1AutoRed extends LinearOpMode {
 
     // Set all servo positions here...
 
+    // Set Team Color and Position while waiting for start
     while(!isStarted()) {
       // Set Red or Blue
       if (gamepad1.x)
@@ -141,6 +142,7 @@ public class Meet1AutoRed extends LinearOpMode {
 
     // Lower the Jewel Manipulator
     jewelManipulator.setPosition(1);
+    sleep(1000);
 
     // Go to each case for each color
     // Check the Color
@@ -177,8 +179,23 @@ public class Meet1AutoRed extends LinearOpMode {
 
     // Raise Arm
     jewelManipulator.setPosition(0);
+    sleep(1000);
 
-    // Drive Forward To Get Off Platform
+    // Drive Right To Get Off Platform
+    holonomic.run(0,1,0);
+    sleep(1000);
+
+    // Score Block Based on Position
+    switch(startingPosition){
+      case LEFT:
+        break;
+      case RIGHT:
+        break;
+      case NULL:
+      default:
+        telemetry.addData("STUPID", "STUPID");
+      break;
+    }
 
   }
 }

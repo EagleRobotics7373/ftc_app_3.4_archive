@@ -70,6 +70,8 @@ public class Meet1Teleop extends OpMode {
   Servo conveyorLeft;
   Servo conveyorRight;
 
+  DcMotor rackPusher;
+
   // Jewel Manipulator
   Servo jewelManipulator;
 
@@ -98,6 +100,8 @@ public class Meet1Teleop extends OpMode {
 
     conveyorLeft = hardwareMap.servo.get("conveyorLeft");
     conveyorRight = hardwareMap.servo.get("conveyorRight");
+
+    rackPusher = hardwareMap.dcMotor.get("rackPusher");
 
     jewelManipulator = hardwareMap.servo.get("jewelManipulator");
 
@@ -154,6 +158,9 @@ public class Meet1Teleop extends OpMode {
     } else if(gamepad2.right_bumper){
       leftIntakeSpinner.setPosition(0);
       rightIntakeSpinner.setPosition(1);
+      // Set to out position
+      tensionWheelFront.setPosition(0);
+      tensionWheelRear.setPosition(0);
     } else {
       leftIntakeSpinner.setPosition(.5);
       rightIntakeSpinner.setPosition(.5);
@@ -161,10 +168,12 @@ public class Meet1Teleop extends OpMode {
 
     // Run the Tension Wheels
     if(gamepad2.right_bumper){
+      // Set to out position
       tensionWheelFront.setPosition(1);
-      tensionWheelRear.setPosition(0);
+      tensionWheelRear.setPosition(1);
     } else if(gamepad2.dpad_left){
-      tensionWheelFront.setPosition(1);
+      // Set to in position
+      tensionWheelFront.setPosition(0);
       tensionWheelRear.setPosition(0);
     }
 
@@ -172,6 +181,10 @@ public class Meet1Teleop extends OpMode {
     if (gamepad2.dpad_up){
       conveyorLeft.setPosition(1);
       conveyorRight.setPosition(0);
+
+      // Set to in position
+      tensionWheelFront.setPosition(1);
+      tensionWheelRear.setPosition(1);
     } else if (gamepad2.dpad_down){
       conveyorLeft.setPosition(0);
       conveyorRight.setPosition(1);
@@ -179,6 +192,11 @@ public class Meet1Teleop extends OpMode {
       conveyorLeft.setPosition(.5);
       conveyorRight.setPosition(.5);
     }
+
+    // Run the Rack Pusher
+    Double rackPusherPower = (double)gamepad2.left_stick_y;
+    rackPusherPower = Range.clip(rackPusherPower, -1, 1);
+    rackPusher.setPower(rackPusherPower);
 
     // Run the jewel manipulator
     if(gamepad2.y){
