@@ -49,7 +49,7 @@ import java.lang.InterruptedException;
  */
 @Autonomous(name = "Autonomous", group = "Meet 1")
 //@Disabled
-public class Meet1AutoRed extends LinearOpMode {
+public class Meet1Auto extends LinearOpMode {
 
   private ElapsedTime runtime = new ElapsedTime();
 
@@ -62,17 +62,14 @@ public class Meet1AutoRed extends LinearOpMode {
   Holonomic holonomic;
 
   // Lift System
-  DcMotor threadedRodLift;
+  // Threaded rod lift
+  DcMotor leftThreadedRodLift;
+  DcMotor rightThreadedRodLift;
 
   // Intake/Scorer System
-  Servo leftIntakeSpinner;
-  Servo rightIntakeSpinner;
-
-  Servo tensionWheelFront;
-  Servo tensionWheelRear;
-
-  Servo conveyorLeft;
-  Servo conveyorRight;
+  // Intake
+  Servo leftIntake;
+  Servo rightIntake;
 
   // Jewel Manipulator
   Servo jewelManipulator;
@@ -82,7 +79,7 @@ public class Meet1AutoRed extends LinearOpMode {
 
   // Team Color and Starting Position
   Color teamColor = Color.NULL;
-  StartingPosition startingPosition = StartingPosition.NULL;
+  //StartingPosition startingPosition = StartingPosition.NULL;
 
   @Override
   public void runOpMode() {
@@ -96,16 +93,11 @@ public class Meet1AutoRed extends LinearOpMode {
 
     holonomic = new Holonomic(leftFrontMotor, leftRearMotor, rightFrontMotor, rightRearMotor);
 
-    threadedRodLift = hardwareMap.dcMotor.get("threadedRodLift");
+    leftThreadedRodLift = hardwareMap.dcMotor.get("leftThreadedRodLift");
+    rightThreadedRodLift = hardwareMap.dcMotor.get("rightThreadedRodLift");
 
-    leftIntakeSpinner = hardwareMap.servo.get("leftIntakeSpinner");
-    rightIntakeSpinner = hardwareMap.servo.get("rightIntakeSpinner");
-
-    tensionWheelFront = hardwareMap.servo.get("tensionWheelFront");
-    tensionWheelRear = hardwareMap.servo.get("tensionWheelRear");
-
-    conveyorLeft = hardwareMap.servo.get("conveyorLeft");
-    conveyorRight = hardwareMap.servo.get("conveyorRight");
+    leftIntake = hardwareMap.servo.get("leftIntake");
+    rightIntake = hardwareMap.servo.get("rightIntake");
 
     jewelManipulator = hardwareMap.servo.get("jewelManipulator");
 
@@ -113,6 +105,10 @@ public class Meet1AutoRed extends LinearOpMode {
     colorSensorRight = hardwareMap.colorSensor.get("colorSensorRight");
 
     // Set all servo positions here...
+    jewelManipulator.setPosition(.4);
+
+    leftIntake.setPosition(0);
+    rightIntake.setPosition(1);
 
     // Set Team Color and Position while waiting for start
     while(!isStarted()) {
@@ -123,20 +119,9 @@ public class Meet1AutoRed extends LinearOpMode {
         teamColor = Color.RED;
 
       telemetry.addData("Alliance Color: ", teamColor.toString());
-      String setIt = "SET THE DANG ALLIANCE COLOR";
       if (teamColor == Color.NULL)
-        telemetry.addData("Boiiii: ", setIt);
+        telemetry.addData("Boiiii: ", "Set the Colorrr");
 
-      // Set Postion 1 or 2
-      if(gamepad2.right_bumper)
-        startingPosition = StartingPosition.RIGHT;
-      else if(gamepad2.left_bumper)
-        startingPosition = StartingPosition.LEFT;
-      String setItPlease = "SET THE DANG POSITION";
-      if(startingPosition == startingPosition.NULL)
-        telemetry.addData("Bruhhhhh: ", setItPlease);
-
-      telemetry.addData("Starting Position: ", startingPosition.toString());
       telemetry.update();
     }
 
@@ -151,23 +136,21 @@ public class Meet1AutoRed extends LinearOpMode {
     switch (teamColor){
       case BLUE:
         if(colorSensorLeft.red() > colorSensorLeft.blue() && colorSensorRight.blue() > colorSensorRight.red()){
-          // Drive Left
-          holonomic.run(0, 1, 0);
+          // Drive Fwd
+          holonomic.run(.5, 0, 0);
         } else if(colorSensorLeft.red() < colorSensorLeft.blue() && colorSensorRight.blue() < colorSensorRight.red()){
-          // Drive Right
-          holonomic.run(0,-1,0);
+          // Drive Back
+          holonomic.run(-.5,0,0);
         }
-        sleep(1000);
         break;
       case RED:
         if(colorSensorLeft.red() < colorSensorLeft.blue() && colorSensorRight.blue() < colorSensorRight.red()){
-          // Drive Left
-          holonomic.run(0, 1, 0);
-        } else if(colorSensorLeft.red() > colorSensorLeft.blue() && colorSensorRight.blue() > colorSensorRight.red()){
-          // Drive Right
-          holonomic.run(0,-1,0);
+          // Drive Fwd
+          holonomic.run(.5, 0, 0);
+        } else if(colorSensorLeft.red() > colorSensorLeft.blue() && colorSensorRight.blue() > colorSensorRight.red()) {
+          // Drive Back
+          holonomic.run(-.5, 0, 0);
         }
-        sleep(1000);
         break;
       case NULL:
         telemetry.addData("YOU ARE A ", temp);
@@ -176,16 +159,24 @@ public class Meet1AutoRed extends LinearOpMode {
         telemetry.addData("YOU ARE A ", temp);
         break;
     }
+    sleep(750);
 
     // Raise Arm
     jewelManipulator.setPosition(0);
-    sleep(1000);
+    sleep(500);
+    holonomic.stop();
 
-    // Drive Right To Get Off Platform
-    holonomic.run(0,1,0);
+    // Drive To Get Off Platform
+    if(teamColor == Color.RED)
+      holonomic.run(.5,0,0);
+    else if(teamColor == Color.BLUE)
+      holonomic.run(-.5,0,0);
+
     sleep(1000);
+    holonomic.stop();
 
     // Score Block Based on Position
+    /**
     switch(startingPosition){
       case LEFT:
         break;
@@ -196,6 +187,7 @@ public class Meet1AutoRed extends LinearOpMode {
         telemetry.addData("STUPID", "STUPID");
       break;
     }
+     */
 
   }
 }

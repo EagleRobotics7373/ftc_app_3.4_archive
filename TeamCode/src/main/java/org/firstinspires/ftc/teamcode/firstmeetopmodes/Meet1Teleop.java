@@ -43,7 +43,7 @@ import eaglerobotics.library.functions.MathOperations;
 /**
  * Demonstrates empty OpMode
  */
-@TeleOp(name = "Concept: Holonomic", group = "Concept")
+@TeleOp(name = "Teleop Meet 1", group = "Concept")
 //@Disabled
 public class Meet1Teleop extends OpMode {
 
@@ -57,20 +57,13 @@ public class Meet1Teleop extends OpMode {
 
   Holonomic holonomic;
 
-  // Lift System
-  DcMotor threadedRodLift;
+  // Threaded rod lift
+  DcMotor leftThreadedRodLift;
+  DcMotor rightThreadedRodLift;
 
-  // Intake/Scorer System
-  Servo leftIntakeSpinner;
-  Servo rightIntakeSpinner;
-
-  Servo tensionWheelFront;
-  Servo tensionWheelRear;
-
-  Servo conveyorLeft;
-  Servo conveyorRight;
-
-  DcMotor rackPusher;
+  // Intake
+  Servo leftIntake;
+  Servo rightIntake;
 
   // Jewel Manipulator
   Servo jewelManipulator;
@@ -90,18 +83,11 @@ public class Meet1Teleop extends OpMode {
 
     holonomic = new Holonomic(leftFrontMotor, leftRearMotor, rightFrontMotor, rightRearMotor);
 
-    threadedRodLift = hardwareMap.dcMotor.get("threadedRodLift");
+    leftThreadedRodLift = hardwareMap.dcMotor.get("leftThreadedRodLift");
+    rightThreadedRodLift = hardwareMap.dcMotor.get("rightThreadedRodLift");
 
-    leftIntakeSpinner = hardwareMap.servo.get("leftIntakeSpinner");
-    rightIntakeSpinner = hardwareMap.servo.get("rightIntakeSpinner");
-
-    tensionWheelFront = hardwareMap.servo.get("tensionWheelFront");
-    tensionWheelRear = hardwareMap.servo.get("tensionWheelRear");
-
-    conveyorLeft = hardwareMap.servo.get("conveyorLeft");
-    conveyorRight = hardwareMap.servo.get("conveyorRight");
-
-    rackPusher = hardwareMap.dcMotor.get("rackPusher");
+    leftIntake = hardwareMap.servo.get("leftIntake");
+    rightIntake = hardwareMap.servo.get("rightIntake");
 
     jewelManipulator = hardwareMap.servo.get("jewelManipulator");
 
@@ -117,13 +103,11 @@ public class Meet1Teleop extends OpMode {
   public void init_loop() {
 
   // Set all servo positions in here...
-    jewelManipulator.setPosition(0);
-    conveyorRight.setPosition(.5);
-    conveyorLeft.setPosition(.5);
-    tensionWheelRear.setPosition(0);
-    tensionWheelFront.setPosition(0);
-    leftIntakeSpinner.setPosition(.5);
-    rightIntakeSpinner.setPosition(.5);
+    jewelManipulator.setPosition(.4);
+
+    leftIntake.setPosition(0);
+    rightIntake.setPosition(1);
+
   }
 
   /*
@@ -149,62 +133,23 @@ public class Meet1Teleop extends OpMode {
     // Run the Threaded Rod Lift
     double tempPowerLift = (double)gamepad2.right_stick_y;
     tempPowerLift = Range.clip(tempPowerLift, -1, 1);
-    threadedRodLift.setPower(tempPowerLift);
+    leftThreadedRodLift.setPower(tempPowerLift);
+    rightThreadedRodLift.setPower(tempPowerLift);
 
-    // Run the Intake Spinner
-    if (gamepad2.right_trigger > 0){
-      leftIntakeSpinner.setPosition(1);
-      rightIntakeSpinner.setPosition(0);
-    } else if(gamepad2.right_bumper){
-      leftIntakeSpinner.setPosition(0);
-      rightIntakeSpinner.setPosition(1);
-      // Set to out position
-      tensionWheelFront.setPosition(0);
-      tensionWheelRear.setPosition(0);
-    } else {
-      leftIntakeSpinner.setPosition(.5);
-      rightIntakeSpinner.setPosition(.5);
+    // Run the Intake
+    if(gamepad2.right_trigger > 0){
+      leftIntake.setPosition(0);
+      rightIntake.setPosition(1);
+    } else if(gamepad2.left_trigger > 0){
+      leftIntake.setPosition(1);
+      rightIntake.setPosition(0);
     }
-
-    // Run the Tension Wheels
-    if(gamepad2.right_bumper){
-      // Set to out position
-      tensionWheelFront.setPosition(1);
-      tensionWheelRear.setPosition(1);
-    } else if(gamepad2.dpad_left){
-      // Set to in position
-      tensionWheelFront.setPosition(0);
-      tensionWheelRear.setPosition(0);
-    }
-
-    // Run the Conveyor
-    if (gamepad2.dpad_up){
-      conveyorLeft.setPosition(1);
-      conveyorRight.setPosition(0);
-
-      // Set to in position
-      tensionWheelFront.setPosition(1);
-      tensionWheelRear.setPosition(1);
-    } else if (gamepad2.dpad_down){
-      conveyorLeft.setPosition(0);
-      conveyorRight.setPosition(1);
-    } else {
-      conveyorLeft.setPosition(.5);
-      conveyorRight.setPosition(.5);
-    }
-
-    // Run the Rack Pusher
-    Double rackPusherPower = (double)gamepad2.left_stick_y;
-    rackPusherPower = Range.clip(rackPusherPower, -1, 1);
-    rackPusher.setPower(rackPusherPower);
 
     // Run the jewel manipulator
     if(gamepad2.y){
-      jewelManipulator.setPosition(1);
+      jewelManipulator.setPosition(.7);
     } else if(gamepad2.a){
-      jewelManipulator.setPosition(0);
+      jewelManipulator.setPosition(.4);
     }
-
-
   }
 }
