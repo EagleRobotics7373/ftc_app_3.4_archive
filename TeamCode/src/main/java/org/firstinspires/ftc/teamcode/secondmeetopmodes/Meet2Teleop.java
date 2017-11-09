@@ -27,26 +27,25 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode.firstmeetopmodes;
+package org.firstinspires.ftc.teamcode.secondmeetopmodes;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
-import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 import eaglerobotics.library.drivetrain.Holonomic;
+import eaglerobotics.library.encoder.EncoderMotor;
 import eaglerobotics.library.functions.MathOperations;
 
 /**
  * Demonstrates empty OpMode
  */
-@TeleOp(name = "Teleop Meet 1", group = "Concept")
-@Disabled
-public class Meet1Teleop extends OpMode {
+@TeleOp(name = "Teleop Meet 2", group = "Meet 2")
+//@Disabled
+public class Meet2Teleop extends OpMode {
 
   private ElapsedTime runtime = new ElapsedTime();
 
@@ -61,6 +60,9 @@ public class Meet1Teleop extends OpMode {
   // Threaded rod lift
   DcMotor leftThreadedRodLift;
   DcMotor rightThreadedRodLift;
+  EncoderMotor leftLift;
+  EncoderMotor rightLift;
+  int position;
 
   // Intake
   Servo leftIntake;
@@ -87,8 +89,17 @@ public class Meet1Teleop extends OpMode {
     leftThreadedRodLift = hardwareMap.dcMotor.get("leftThreadedRodLift");
     rightThreadedRodLift = hardwareMap.dcMotor.get("rightThreadedRodLift");
 
+    leftThreadedRodLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+    rightThreadedRodLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+    leftThreadedRodLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+    rightThreadedRodLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+    leftLift = new EncoderMotor(leftThreadedRodLift, 1);
+    rightLift = new EncoderMotor(rightThreadedRodLift, 1);
+
     leftIntake = hardwareMap.servo.get("leftIntake");
     rightIntake = hardwareMap.servo.get("rightIntake");
+
 
     jewelManipulator = hardwareMap.servo.get("jewelManipulator");
 
@@ -104,10 +115,10 @@ public class Meet1Teleop extends OpMode {
   public void init_loop() {
 
   // Set all servo positions in here...
-    //jewelManipulator.setPosition(.3);
+    jewelManipulator.setPosition(.3);
 
-    //leftIntake.setPosition(1);
-    //rightIntake.setPosition(0);
+    leftIntake.setPosition(1);
+    rightIntake.setPosition(0);
 
   }
 
@@ -132,10 +143,34 @@ public class Meet1Teleop extends OpMode {
             MathOperations.pow(gamepad1.right_stick_x, 3));
 
     // Run the Threaded Rod Lift
-    double tempPowerLift = -(double)gamepad2.right_stick_y;
-    tempPowerLift = Range.clip(tempPowerLift, -1, 1);
-    leftThreadedRodLift.setPower(tempPowerLift);
-    rightThreadedRodLift.setPower(tempPowerLift);
+
+    //Run to Position Threaded Rod Lift
+    int upperTarget = 17000;
+    int midTarget = upperTarget/2;
+    int lowerTarget = 7;
+    if (gamepad2.dpad_up){
+      position = upperTarget;
+      leftLift.runToPosition(position);
+      rightLift.runToPosition(position);
+    } else if (gamepad2.dpad_right || gamepad2.dpad_left){
+      position = midTarget;
+    } else if (gamepad2.dpad_down){
+      position = lowerTarget;
+      leftLift.runToPosition(position);
+      rightLift.runToPosition(position);
+    } else {
+      leftThreadedRodLift.setPower(gamepad2.left_stick_y);
+      rightThreadedRodLift.setPower(gamepad2.left_stick_y);
+    }
+
+
+    // Run Threaded Rod Lift
+    //leftThreadedRodLift.setPower(-gamepad2.left_stick_y);
+    //rightThreadedRodLift.setPower(-gamepad2.left_stick_y);
+
+
+    telemetry.addData("Left E Val: ", leftThreadedRodLift.getCurrentPosition());
+    telemetry.addData("Right E Val: ", rightThreadedRodLift.getCurrentPosition());
 
     // Run the Intake
     if(gamepad2.right_trigger > 0){

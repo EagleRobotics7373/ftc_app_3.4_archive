@@ -27,30 +27,23 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode.firstmeetopmodes;
+package org.firstinspires.ftc.teamcode.secondmeetopmodes;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
-import com.qualcomm.robotcore.hardware.ColorSensor;
 
 import eaglerobotics.library.drivetrain.Holonomic;
-import eaglerobotics.library.functions.MathOperations;
-
-import java.lang.InterruptedException;
 
 /**
  * Demonstrates empty OpMode
  */
 @Autonomous(name = "Autonomous", group = "Meet 1")
-@Disabled
-public class Meet1Auto extends LinearOpMode {
+//@Disabled
+public class Meet2Auto extends LinearOpMode {
 
   private ElapsedTime runtime = new ElapsedTime();
 
